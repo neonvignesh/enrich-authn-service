@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: enrich-authn-configmap
+  namespace: iris
+data:
+  HYDRA_AUTHN_CHANGE_PASSWORD_URL: http://hydra-authn-services.iris.svc.cluster.local:9002/hydra-authn-api/v1/password/change
+  HYDRA_AUTHN_FORGOT_PASSWORD_URL: http://hydra-authn-services.iris.svc.cluster.local:9002/hydra-authn-api/v1/password/forgot
+  HYDRA_AUTHN_GENERATE_OTP_URL: http://hydra-authn-services.iris.svc.cluster.local:9002/hydra-authn-api/v1/otp/generate
+  HYDRA_AUTHN_LOGIN_URL: http://hydra-authn-services.iris.svc.cluster.local:9002/hydra-authn-api/v1/otp/login
+  HYDRA_AUTHN_LOGOUT_URL: http://hydra-authn-services.iris.svc.cluster.local:9002/hydra-authn-api/v1/logout
+  SMS_SENDER_URL: http://hpsms.dial4sms.com/api/v4/?
+  EMAIL_SENDER_URL: http://192.168.1.154:8095/email/send
+  HYDRA_AUTHN_AUTHENTICATE_URL: http://hydra-authn-services.iris.svc.cluster.local:9002/hydra-authn-api/v1/authenticate
+  HYDRA_AUTHN_MWLIST_URL: http://hydra-authn-services.iris.svc.cluster.local:9002/hydra-authn-api/v1/mwList
+  HYDRA_AUTHN_ENABLE_TOTP_URL: http://hydra-authn-services.iris.svc.cluster.local:9002/hydra-authn-api/v1/enable/totp
+ 

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: enrich-authn-services 
+  namespace: iris
+spec:
+  selector:
+    app: enrich-authn-services
+  ports:
+    - protocol: TCP
+      port: 9001
+      targetPort: 9001
+  type: ClusterIP

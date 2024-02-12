@@ -1,0 +1,145 @@
+server:
+    port: ${fund.service.port:9001} # Server port number
+    max-http-header-size: 65536
+    shutdown: graceful # Shutdown the resouce gracefully
+    servlet:
+       contextPath: /${spring.application.name}
+       session:
+          cookie:
+             secure: true # Global Settings for seure the Cookies
+             http-only: true #  For XSRF attach - Client can't read the cookies 
+       tomcat:
+          max-threads: 10
+          max-connections: 10
+    compression:
+       enabled: 'true'
+       min-response-size: '1024'
+hazelcast:
+  cache:
+    books:
+      management-enabled: true
+# Spring health monitoring
+management:
+   health:
+      jms:
+         enabled: true 
+   endpoints:
+    web:
+      exposure:
+        include: threaddump
+   endpoint:
+    threaddump:
+      enabled: true      
+
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+  jackson:
+    default-property-inclusion: non_null
+    serialization-inclusion: non_null
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  main:
+      allow-bean-definition-overriding: true
+      lazy-initialization: true
+  servlet:
+     multipart:
+       enabled: true
+       max-request-size: 2MB
+       max-file-size: 2MB 
+  datasource: # Connection String for database connection
+    driver-class-name: org.postgresql.Driver
+    platform: POSTGRESQL
+    username: ${ENRICH_AUTHN_USERS_API_USER} # DB user name
+    password: ${ENRICH_AUTHN_USERS_API_USER_PASSWORD}  # DB Password
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${ENRICH_AUTHN_URL} # DB URL
+    testWhileIdle: true
+    validationQuery: SELECT 1
+    hikari:
+      connection-timeout: ${HIKARI_CONNECTION_TIMEOUT}
+      max-lifetime: ${HIKARI_MAX_LIFETIME}
+      max-pool-size: ${DB_MAX_CONNECTION_POOL_SIZE}
+      minimum-idle: ${DB_MIN_CONNECTION_IDLE_SIZE}
+      data-source-properties:
+        stringtype: unspecified
+  jpa:
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+      naming:
+       implicit-startegy: org.hibernate.boot.model.naming.ImplicitNamingStartegyLegacyJapImpl
+       physical-startegy: org.hibernate.boot.model.naming.PhysicalNamingStartegyLegacyJapImpl
+    properties:
+      hibernate:
+        default_schema: users
+        show_sql: false
+        format_sql: true
+        jdbc:
+          fetch_size: ${db.result.fetch.size:200}
+    show-sql: true
+# Redis Cache Configuration
+  cache:
+    type: redis
+  redis:
+    host: ${REDIS_HOST_NAME}
+    port: ${REDIS_PORT}
+    #Time to live - 24 Hours (In seconds)
+    #Time to live - 1 Hour (In seconds)
+    time-to-live: 3600
+    #Timeout 5 Seconds
+    timeout: 5000
+    serializer: org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
+# Logging Configuration
+logging:
+   level:
+      root: INFO
+      com.enrich.fundmanager: INFO
+      org.springframework: INFO 
+      org.apache.http: INFO
+   filePath: ${log.file.path:fundmanager}
+   fileName: fundmanager-service
+   consolePattern: "%d{yyyy-MM-dd} | %d{HH:mm:ss SS} | [%t] | %-5level	 | [%X{traceId}-%X{user}] %logger{35}:%L | %m%n"
+   filePattern: "%d{yyyy-MM-dd} | %d{HH:mm:ss SS} | [%t] | %-5level | [%X{traceId}-%X{user}] %logger{35}:%L | %m%n"
+   fileMaxSize: "50MB"
+   fileMaxHistory: 100
+   fileTotalCap: "20GB"
+hydra:
+  Login:
+    url: ${HYDRA_AUTHN_LOGIN_URL}
+  authenticate:
+    url: ${HYDRA_AUTHN_AUTHENTICATE_URL}
+  forgotpassword:
+    url: ${HYDRA_AUTHN_FORGOT_PASSWORD_URL}
+  changepassword:
+    url: ${HYDRA_AUTHN_CHANGE_PASSWORD_URL}
+  logout:
+    url: ${HYDRA_AUTHN_LOGOUT_URL}
+  generateotp:
+    url: ${HYDRA_AUTHN_GENERATE_OTP_URL}
+  mwlist:
+    url: ${HYDRA_AUTHN_MWLIST_URL}
+  totp:
+    url: ${HYDRA_AUTHN_ENABLE_TOTP_URL}
+  api:
+   key: ${HYDRA_AUTHN_API_KEY}
+jwt: 
+  secretkey : ${JWT_SECRET_KEY}
+rsa:
+  publickey: ${PUBLIC_KEY}
+  privatekey: ${PRIVATE_KEY}
+  
+sms:
+  sender:
+    url: ${SMS_SENDER_URL}
+    api-key: ${SMS_SENDER_KEY}
+email:
+  sender:
+    url: ${EMAIL_SENDER_URL}
+    api-key: ${EMAIL_SENDER_KEY}
+    
+    
+  
+    

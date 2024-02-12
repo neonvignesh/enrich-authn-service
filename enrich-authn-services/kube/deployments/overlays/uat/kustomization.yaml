@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+bases:
+- ../../base
+patchesStrategicMerge:
+- enrich-authn-configmap.yaml
+- enrich-authn-secret.yaml
+- replicas.yaml
+- resource.yaml
+- enrich-authn-deployment-hpa.yaml

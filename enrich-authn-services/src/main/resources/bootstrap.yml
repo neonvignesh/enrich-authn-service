@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: authn-api
+#  cloud:
+#    config:
+#      enabled: true
+#      uri: ${springcloud.config.uri:http://localhost}:8010/config-server/
+#      name: mutual-fund,fund-service
+#      profile: ${CLOUD_CONFIG_PROFILE}
+#      label: ${CLOUD_CONFIG_LABEL}

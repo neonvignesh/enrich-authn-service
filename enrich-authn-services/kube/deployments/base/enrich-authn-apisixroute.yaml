@@ -1,0 +1,22 @@
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: enrich-authn-route  
+  namespace: iris
+spec:
+  http:
+    - name: enrich-authn-route  
+      match:
+        paths:
+          - /authn-api/*  
+      backends:
+        - serviceName: enrich-authn-services
+          servicePort: 9001 
+      plugins:
+        - name: limit-count
+          enable: true
+          config:
+            count: 3000
+            time_window: 60
+            rejected_code: 429
+            rejected_msg: "Request limit exceeded. Please try again later."

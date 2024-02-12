@@ -1,0 +1,42 @@
+@startuml
+
+title "User_Login"
+
+autonumber 
+skinparam sequenceMessageAlign left
+skinparam backgroundColor white
+skinparam ArrowColor FireBrick
+skinparam ActorBorderColor  FireBrick
+skinparam LifeLineBorderColor FireBrick
+skinparam roundcorner 15
+skinparam participantBorderThickness  1
+skinparam actorBorderThickness  1
+skinparam LifeLineBackgroundColor FireBrick
+skinparam ParticipantBorderColor FireBrick
+skinparam ParticipantBackgroundColor Business
+skinparam ParticipantFontName Impact
+skinparam ParticipantFontSize 12
+skinparam ParticipantFontColor Black
+skinparam ActorBackgroundColor Business
+skinparam ActorFontColor Black
+skinparam ActorFontSize 12
+
+actor User as user
+participant "Enrich-Authn-Service" as auth #khaki
+database "Enrich_Authn \n Database \n (k8s)" as db #BurlyWood
+participant "Enrich-Kambala-Proxy-Service \n(Hydra) " as hydra #khaki
+participant "Kambala Service" as kambala #B4A7E5
+participant "Redis" as redis #Pink
+
+user -> auth : get credential to call login service 
+note over hydra :All Kambala API 
+auth -> hydra : call hydra service for login
+hydra -> kambala: request to initiate Login 
+hydra <- kambala: response of Login  to hydra 
+auth <- hydra: response of hydra
+auth -> redis: if login response  success then generate jwt  and store jKey based on source, jwt
+auth -> db : save all req & res
+user<- auth: Display login status
+
+
+@enduml

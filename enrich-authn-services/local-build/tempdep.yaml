@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enrich-authn-deployment
+  #namespace: iris
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enrich-authn
+  template:
+    metadata:
+      labels:
+        app: enrich-authn
+    spec:
+      containers:
+        - name: enrich-authn-api-container
+          image: neonvignesh/enrichprojects:enrich-authn-service-20231711-111100
+          ports:
+            - containerPort: 9001
+
+          readinessProbe:
+            httpGet:
+              path: /authn-api/v1/health
+              port: 9001
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: /authn-api/v1/health
+              port: 9001
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+          resources:
+            requests:
+              cpu: "0.1"
+              memory: "128Mi"
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+          env:
+            - name: HYDRA_AUTHN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: enrich-authn-service-secret
+                  key: HYDRA_AUTHN_API_KEY
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: enrich-authn-service-secret
+                  key: JWT_SECRET_KEY
+            - name: POSTGRES_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: enrich-authn-service-secret
+                  key: POSTGRES_USER_PASSWORD
+            - name: PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: enrich-authn-service-secret
+                  key: PRIVATE_KEY
+            - name: HYDRA_AUTHN_CHANGEPASSWORD_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-service-configmap
+                  key: HYDRA_AUTHN_CHANGEPASSWORD_URL
+            - name: HYDRA_AUTHN_FORGOTPASSWORD_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-service-configmap
+                  key: HYDRA_AUTHN_FORGOTPASSWORD_URL
+            - name: HYDRA_AUTHN_GENERATE_OTP_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-service-configmap
+                  key: HYDRA_AUTHN_GENERATE_OTP_URL
+            - name: HYDRA_AUTHN_LOGIN_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-service-configmap
+                  key: HYDRA_AUTHN_LOGIN_URL
+            - name: HYDRA_AUTHN_LOGOUT_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-service-configmap
+                  key: HYDRA_AUTHN_LOGOUT_URL
+            - name: POSTGRES_API_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-service-configmap
+                  key: POSTGRES_API_USER
+            - name: POSTGRES_HOSTS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-service-configmap
+                  key: POSTGRES_HOSTS_URL
+            - name: REDIS_HOST_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-service-configmap
+                  key: REDIS_HOST_NAME
+            - name: REDIS_PORT_NO
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-service-configmap
+                  key: REDIS_PORT_NO
+            - name: PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: enrich-authn-service-secret
+                  key: PUBLIC_KEY
+
+      imagePullSecrets:
+        - name: docker-hub-image-secret

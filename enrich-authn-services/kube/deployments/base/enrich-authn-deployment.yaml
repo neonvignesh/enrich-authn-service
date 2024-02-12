@@ -1,0 +1,176 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enrich-authn-deployment
+  namespace: iris
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: enrich-authn-services
+  template:
+    metadata:
+      labels:
+        app: enrich-authn-services
+        version: {{VERSION}}
+    spec:
+      containers:
+        - name: enrich-authn-container
+          image: {{IMAGE_NAME}}
+          ports:
+            - containerPort: 9001
+
+          readinessProbe:
+            httpGet:
+              path: /authn-api/internal/health
+              port: 9001
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: /authn-api/internal/health
+              port: 9001
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 10
+          resources:
+            requests:
+              cpu: "0.5"
+              memory: "256Mi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+          env:
+            - name: HYDRA_AUTHN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: hydra-authn-secret
+                  key: HYDRA_AUTHN_API_KEY
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: enrich-authn-secret
+                  key: JWT_SECRET_KEY
+            - name: ENRICH_AUTHN_USERS_API_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pg1-secret
+                  key: ENRICH_AUTHN_USERS_API_USER_PASSWORD
+            - name: PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: enrich-authn-secret
+                  key: PRIVATE_KEY
+            - name: HYDRA_AUTHN_CHANGE_PASSWORD_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-configmap
+                  key: HYDRA_AUTHN_CHANGE_PASSWORD_URL
+            - name: HYDRA_AUTHN_FORGOT_PASSWORD_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-configmap
+                  key: HYDRA_AUTHN_FORGOT_PASSWORD_URL
+            - name: HYDRA_AUTHN_GENERATE_OTP_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-configmap
+                  key: HYDRA_AUTHN_GENERATE_OTP_URL
+            - name: HYDRA_AUTHN_LOGIN_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-configmap
+                  key: HYDRA_AUTHN_LOGIN_URL
+            - name: HYDRA_AUTHN_LOGOUT_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-configmap
+                  key: HYDRA_AUTHN_LOGOUT_URL
+            - name: ENRICH_AUTHN_USERS_API_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: pg1-configmap
+                  key: ENRICH_AUTHN_USERS_API_USER
+            - name: ENRICH_AUTHN_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: pg1-configmap
+                  key: ENRICH_AUTHN_URL
+            - name: REDIS_HOST_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: redis-configmap
+                  key: REDIS_HOST_NAME
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: redis-configmap
+                  key: REDIS_PORT
+            - name: PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: enrich-authn-secret
+                  key: PUBLIC_KEY
+            - name: SMS_SENDER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: enrich-authn-secret
+                  key: SMS_SENDER_KEY
+            - name: EMAIL_SENDER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: enrich-authn-secret
+                  key: EMAIL_SENDER_KEY
+            - name: SMS_SENDER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-configmap
+                  key: SMS_SENDER_URL
+            - name: HYDRA_AUTHN_AUTHENTICATE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-configmap
+                  key: HYDRA_AUTHN_AUTHENTICATE_URL            
+            - name: EMAIL_SENDER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-configmap
+                  key: EMAIL_SENDER_URL
+            - name: HYDRA_AUTHN_MWLIST_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-configmap
+                  key: HYDRA_AUTHN_MWLIST_URL
+            - name: HYDRA_AUTHN_ENABLE_TOTP_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: enrich-authn-configmap
+                  key: HYDRA_AUTHN_ENABLE_TOTP_URL    
+            - name: HIKARI_CONNECTION_TIMEOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-custom-configmap
+                  key: HIKARI_CONNECTION_TIMEOUT
+            - name: HIKARI_MAX_LIFETIME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-custom-configmap
+                  key: HIKARI_MAX_LIFETIME
+            - name: DB_MAX_CONNECTION_POOL_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-custom-configmap
+                  key: DB_MAX_CONNECTION_POOL_SIZE
+            - name: DB_MIN_CONNECTION_IDLE_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-custom-configmap
+                  key: DB_MIN_CONNECTION_IDLE_SIZE 
+      imagePullSecrets:
+        - name: docker-hub-image-secret
+        #kmkmkmkmkmkm
